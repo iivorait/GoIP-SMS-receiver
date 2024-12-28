@@ -10,7 +10,8 @@ GoIP has an "SMS to Email" feature in Configurations --> SMS, but it does not wo
 
 ## Execution - Building - Configuration
 
-Requirements: a modern PHP version with the Sockets extension
+Requirements: a modern PHP version with the Sockets extension.
+The email sending uses the PHPMailer library, which is installed with Composer (`composer install`).
 
 Use with your existing server by executing `php receive.php` in a screen etc. session, or use the Dockerfile with Docker / Podman / Unraid / Portainer etc.. You can build the container image yourself, or use the builds from https://github.com/iivorait/GoIP-SMS-receiver/pkgs/container/goip-sms-receiver
 
