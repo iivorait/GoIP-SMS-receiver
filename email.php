@@ -28,6 +28,7 @@ if(empty($mail)) {
     if(empty(getenv('SMTP_USERNAME'))) { // unauthenticated SMTP
         $mail->SMTPAuth = false;
     } else {
+        $mail->SMTPAuth = true;
         $mail->Username = getenv('SMTP_USERNAME');
         $mail->Password = getenv('SMTP_PASSWORD');
     }
@@ -38,12 +39,14 @@ if(empty($mail)) {
     
     $mail->setFrom(getenv('SMTP_FROM'));
     $mail->addAddress(getenv('SMTP_TO'));
+    $mail->isHTML(false);
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
 }
 
 try {
-    $mail->isHTML(false);
     $mail->Subject = $subject;
-    $mail->Body = getenv('SMTP_PREFACE') ?: '' . $fullMsg;
+    $mail->Body = (getenv('SMTP_PREFACE') ?: '') . $fullMsg;
     $mail->send();
     echo "Email message sent successfully!\n";
 } catch (Exception $e) {
