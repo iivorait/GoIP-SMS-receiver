@@ -56,9 +56,9 @@ while (true) {
 
     // Process only RECEIVE messages
 	if(substr($params[0], 0, 8) != "RECEIVE:") {
-        if($logVerbosity == "debug") {
-            echo "Not a RECEIVE message, skipping the parsing\n";
-        }
+        // Respond to "req" keepalive messages
+        processKeepalive($sock, $remoteIp, $remotePort, $params, $logVerbosity);
+        
         // Check if SMS messages need to be sent forward
         // This works because GoIP is chatty with CELLINFO etc. messages that trigger this function every now and then
         purgeOldMessages($waitForMultipart);
@@ -98,6 +98,20 @@ while (true) {
 
 socket_close($sock);
 
+/**
+ * Answer to the GoIP keepalive messages (show SMS = Y on the GoIP Status --> Summary page)
+ * example request: req:19;id:goip01;pass:XXX;num:;signal:15;gsm_status:LOGIN;voip_status:LOGIN;voip_state:IDLE;remain_time:-1;imei:123455;imsi:345667;iccid:678890;pro:dna;
+ * example response: reg:19;status:200;
+ */
+function processKeepalive($sock, $remoteIp, $remotePort, $params, $logVerbosity) {
+    if(substr($params[0], 0, 4) == "req:") {
+        $msg = str_replace("req", "reg", $params[0]) . ";status:200;";
+        if($logVerbosity == "debug") {
+            echo "Sending keepalive response: $msg to $remoteIp:$remotePort \n";
+        }
+        socket_sendto($sock, $msg, strlen($msg), 0, $remoteIp, $remotePort);
+    }
+}
 
 /**
  * Global array holding queued messages
